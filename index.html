@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ascenso · Ruta de inglés A1 → C2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800;900&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#080b14;
+    --bg-mid:#0f1526;
+    --bg-card:rgba(18,25,44,0.62);
+    --border:rgba(231,238,245,0.09);
+    --ice:#e9eff6;
+    --muted:#8695b3;
+    --gold:#f2b705;
+    --gold-dim:rgba(242,183,5,0.35);
+    --ember:#ff7a45;
+    --teal:#3fe0c5;
+    --font-display:'Unbounded', sans-serif;
+    --font-body:'Manrope', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--bg-deep);
+    color:var(--ice);
+    font-family:var(--font-body);
+    line-height:1.55;
+    overflow-x:hidden;
+  }
+
+  ::selection{background:var(--gold);color:#080b14;}
+
+  /* ---------- background canvas & scrim ---------- */
+  #bg-canvas{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    display:block;
+  }
+
+  .scrim{
+    position:fixed;
+    inset:0;
+    z-index:1;
+    pointer-events:none;
+    background:
+      radial-gradient(ellipse 90% 60% at 50% 0%, rgba(8,11,20,0) 0%, rgba(8,11,20,0.55) 55%, rgba(8,11,20,0.92) 100%),
+      linear-gradient(180deg, rgba(8,11,20,0.35) 0%, rgba(8,11,20,0.15) 20%, rgba(8,11,20,0.65) 100%);
+  }
+
+  .grain{
+    position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- top progress bar ---------- */
+  #topbar{
+    position:fixed;top:0;left:0;height:2px;width:0%;
+    background:linear-gradient(90deg,var(--ember),var(--gold));
+    z-index:50;transition:width .08s linear;
+    box-shadow:0 0 12px var(--gold-dim);
+  }
+
+  /* ---------- nav ---------- */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:40;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:22px clamp(20px,4vw,56px);
+    font-family:var(--font-mono);
+  }
+  .brand{
+    font-size:13px;letter-spacing:.14em;color:var(--ice);
+    display:flex;align-items:center;gap:8px;cursor:pointer;
+  }
+  .brand .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold);}
+  .alt-readout{
+    font-size:12px;color:var(--muted);letter-spacing:.08em;
+    display:flex;gap:10px;align-items:center;
+  }
+  .alt-readout b{color:var(--gold);font-weight:500;}
+
+  /* ---------- progress rail ---------- */
+  #rail{
+    position:fixed;right:26px;top:50%;transform:translateY(-50%);
+    z-index:40;display:flex;flex-direction:column;gap:18px;
+  }
+  .rail-dot{
+    display:flex;align-items:center;gap:10px;cursor:pointer;
+    justify-content:flex-end;
+  }
+  .rail-label{
+    font-family:var(--font-mono);font-size:11px;color:var(--muted);
+    opacity:0;transform:translateX(6px);transition:opacity .25s, transform .25s;
+    white-space:nowrap;
+  }
+  .rail-dot:hover .rail-label, .rail-dot.active .rail-label{opacity:1;transform:translateX(0);color:var(--ice);}
+  .rail-mark{
+    width:8px;height:8px;border-radius:50%;
+    border:1.5px solid var(--muted);background:transparent;
+    transition:all .3s;
+  }
+  .rail-dot.active .rail-mark{
+    background:var(--gold);border-color:var(--gold);
+    box-shadow:0 0 10px var(--gold-dim);transform:scale(1.3);
+  }
+
+  @media (max-width:860px){ #rail{display:none;} }
+
+  /* ---------- layout shells ---------- */
+  main{position:relative;z-index:5;}
+  section{
+    position:relative;
+    padding:120px clamp(20px,6vw,90px);
+    max-width:1180px;margin:0 auto;
+  }
+  .eyebrow{
+    font-family:var(--font-mono);font-size:12px;letter-spacing:.18em;
+    color:var(--gold);text-transform:uppercase;margin-bottom:18px;
+    display:inline-flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:'';width:22px;height:1px;background:var(--gold);}
+
+  h1,h2,h3{font-family:var(--font-display);font-weight:800;letter-spacing:-.01em;}
+
+  /* ---------- hero ---------- */
+  .hero{
+    min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+    padding-top:160px;
+  }
+  .hero h1{
+    font-size:clamp(2.6rem,7vw,5.6rem);line-height:0.98;
+    background:linear-gradient(180deg,#ffffff 10%, #cdd8e8 60%, #8695b3 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    max-width:14ch;
+  }
+  .hero p.lead{
+    margin-top:28px;font-size:clamp(1rem,1.6vw,1.25rem);color:var(--muted);
+    max-width:46ch;
+  }
+  .hero-cta{margin-top:44px;display:flex;gap:16px;flex-wrap:wrap;}
+  .btn{
+    font-family:var(--font-mono);font-size:13px;letter-spacing:.04em;
+    padding:15px 26px;border-radius:2px;cursor:pointer;
+    border:1px solid var(--border);background:transparent;color:var(--ice);
+    transition:all .25s;text-decoration:none;display:inline-flex;align-items:center;gap:10px;
+  }
+  .btn.primary{
+    background:var(--gold);color:#141008;border-color:var(--gold);font-weight:500;
+  }
+  .btn.primary:hover{box-shadow:0 0 26px var(--gold-dim);transform:translateY(-2px);}
+  .btn.ghost:hover{border-color:var(--ice);background:rgba(255,255,255,0.04);transform:translateY(-2px);}
+
+  .hero-stats{
+    margin-top:80px;display:flex;gap:clamp(24px,5vw,64px);flex-wrap:wrap;
+    font-family:var(--font-mono);
+  }
+  .hero-stats .stat b{
+    display:block;font-size:1.8rem;color:var(--ice);font-family:var(--font-display);font-weight:800;
+  }
+  .hero-stats .stat span{font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;}
+
+  /* ---------- reveal animation ---------- */
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .8s ease, transform .8s ease;}
+  .reveal.is-visible{opacity:1;transform:translateY(0);}
+  .reveal-stagger > *{opacity:0;transform:translateY(20px);transition:opacity .6s ease, transform .6s ease;}
+  .reveal-stagger.is-visible > *{opacity:1;transform:translateY(0);}
+  .reveal-stagger.is-visible > *:nth-child(1){transition-delay:.05s;}
+  .reveal-stagger.is-visible > *:nth-child(2){transition-delay:.12s;}
+  .reveal-stagger.is-visible > *:nth-child(3){transition-delay:.19s;}
+  .reveal-stagger.is-visible > *:nth-child(4){transition-delay:.26s;}
+  .reveal-stagger.is-visible > *:nth-child(5){transition-delay:.33s;}
+  .reveal-stagger.is-visible > *:nth-child(6){transition-delay:.40s;}
+
+  /* ---------- quiz ---------- */
+  .quiz-box{
+    background:var(--bg-card);border:1px solid var(--border);border-radius:4px;
+    padding:clamp(24px,4vw,48px);backdrop-filter:blur(14px);
+  }
+  .quiz-q{margin-bottom:34px;}
+  .quiz-q:last-child{margin-bottom:0;}
+  .quiz-q p{font-family:var(--font-display);font-weight:600;font-size:1.05rem;margin-bottom:16px;}
+  .quiz-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;}
+  .quiz-opt{
+    font-size:14px;text-align:left;padding:13px 16px;border-radius:2px;
+    border:1px solid var(--border);background:rgba(255,255,255,0.02);color:var(--ice);
+    cursor:pointer;transition:all .2s;font-family:var(--font-body);
+  }
+  .quiz-opt:hover{border-color:var(--gold-dim);background:rgba(242,183,5,0.06);}
+  .quiz-opt.selected{border-color:var(--gold);background:rgba(242,183,5,0.12);}
+  .quiz-result{
+    margin-top:36px;padding-top:32px;border-top:1px dashed var(--border);
+    display:none;
+  }
+  .quiz-result.show{display:block;}
+  .quiz-result .code{
+    font-family:var(--font-mono);color:var(--gold);font-size:13px;letter-spacing:.1em;
+  }
+  .quiz-result h3{font-size:1.8rem;margin:10px 0 12px;}
+  .quiz-result p{color:var(--muted);max-width:52ch;margin-bottom:20px;}
+
+  /* ---------- camp sections ---------- */
+  .camp{
+    border-top:1px solid var(--border);
+    padding-top:100px;padding-bottom:100px;
+  }
+  .camp-head{
+    display:flex;gap:28px;align-items:baseline;flex-wrap:wrap;margin-bottom:14px;
+  }
+  .camp-code{
+    font-family:var(--font-mono);font-size:14px;letter-spacing:.1em;
+    color:#141008;background:var(--gold);padding:6px 14px;border-radius:2px;font-weight:700;
+  }
+  .camp-elev{font-family:var(--font-mono);font-size:12px;color:var(--muted);letter-spacing:.08em;}
+  .camp h2{font-size:clamp(2rem,4.4vw,3.4rem);margin:8px 0 6px;}
+  .camp-subtitle{color:var(--ember);font-family:var(--font-mono);font-size:13px;letter-spacing:.06em;margin-bottom:22px;}
+  .camp-desc{color:var(--muted);max-width:60ch;font-size:1.02rem;margin-bottom:36px;}
+
+  .camp-meta{
+    display:flex;gap:36px;flex-wrap:wrap;margin-bottom:40px;
+    font-family:var(--font-mono);font-size:12px;color:var(--muted);
+  }
+  .camp-meta div b{display:block;color:var(--ice);font-family:var(--font-body);font-weight:700;font-size:14px;margin-top:4px;}
+
+  .topics{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:30px;
+  }
+  .topic-card{
+    border:1px solid var(--border);background:rgba(255,255,255,0.015);
+    padding:18px 20px;border-radius:3px;transition:all .25s;
+  }
+  .topic-card:hover{border-color:var(--gold-dim);background:rgba(242,183,5,0.04);transform:translateX(3px);}
+  .topic-card .flag{color:var(--gold);font-family:var(--font-mono);font-size:12px;margin-bottom:6px;display:block;}
+  .topic-card p{font-size:14.5px;color:var(--ice);}
+
+  .dev-tip{
+    margin-top:8px;border-left:2px solid var(--teal);padding:16px 22px;
+    background:rgba(63,224,197,0.05);border-radius:0 3px 3px 0;
+  }
+  .dev-tip .flag{color:var(--teal);font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;display:block;margin-bottom:6px;}
+  .dev-tip p{font-size:14px;color:#cbe9e2;}
+
+  /* ---------- summit cta ---------- */
+  .summit{
+    text-align:center;border-top:1px solid var(--border);padding-top:120px;
+  }
+  .summit .eyebrow{margin-left:auto;margin-right:auto;}
+  .summit h2{font-size:clamp(2rem,5vw,3.6rem);max-width:16ch;margin:0 auto 20px;}
+  .summit p.lead{color:var(--muted);max-width:52ch;margin:0 auto 50px;}
+
+  .kit-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;text-align:left;
+  }
+  .kit-card{
+    border:1px solid var(--border);padding:24px;border-radius:3px;background:rgba(255,255,255,0.015);
+  }
+  .kit-card .flag{font-family:var(--font-mono);font-size:11px;color:var(--gold);letter-spacing:.1em;}
+  .kit-card h4{font-family:var(--font-display);font-size:1.05rem;margin:10px 0 8px;}
+  .kit-card p{font-size:13.5px;color:var(--muted);}
+
+  footer{
+    text-align:center;padding:60px 20px 50px;color:var(--muted);
+    font-family:var(--font-mono);font-size:12px;letter-spacing:.05em;
+    border-top:1px solid var(--border);
+  }
+
+  @media (max-width:640px){
+    section{padding:90px 22px;}
+    .camp-meta{gap:24px;}
+    nav{padding:18px 20px;}
+    .alt-readout{display:none;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    .reveal, .reveal-stagger > *{transition:none;opacity:1;transform:none;}
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div class="scrim"></div>
+<div class="grain"></div>
+<div id="topbar"></div>
+
+<nav>
+  <div class="brand" onclick="document.getElementById('hero').scrollIntoView()">
+    <span class="dot"></span> ASCENSO&nbsp;// EN
+  </div>
+  <div class="alt-readout">ALTITUD <b id="alt-readout">0m</b> · <span id="camp-readout">BASE</span></div>
+</nav>
+
+<aside id="rail"></aside>
+
+<main>
+
+  <section class="hero" id="hero">
+    <span class="eyebrow reveal">Ruta de aprendizaje · A1 → C2</span>
+    <h1 class="reveal">Sube la montaña<br>del inglés.</h1>
+    <p class="lead reveal">Seis campamentos, un solo camino. De tus primeras palabras a pensar directamente en inglés — con paradas pensadas para developers y analistas que necesitan usar el idioma en serio, no solo aprobar un examen.</p>
+    <div class="hero-cta reveal">
+      <a class="btn primary" href="#quiz">Descubre tu punto de partida</a>
+      <a class="btn ghost" href="#a1">Ver la ruta completa ↓</a>
+    </div>
+    <div class="hero-stats reveal">
+      <div class="stat"><b>6</b><span>Campamentos</span></div>
+      <div class="stat"><b>~24</b><span>Meses estimados</span></div>
+      <div class="stat"><b>5,895m</b><span>Altitud de la cumbre</span></div>
+    </div>
+  </section>
+
+  <section id="quiz">
+    <span class="eyebrow reveal">Autoevaluación rápida</span>
+    <h2 class="reveal" style="font-size:clamp(1.8rem,3.6vw,2.6rem);max-width:16ch;margin-bottom:30px;">¿Dónde empieza tu ascenso?</h2>
+    <div class="quiz-box reveal" id="quiz-box"></div>
+  </section>
+
+  <div id="camps-container"></div>
+
+  <section class="summit reveal">
+    <span class="eyebrow">Después de la cumbre</span>
+    <h2>Llegar a C2 no es el final, es un idioma de trabajo</h2>
+    <p class="lead">La cumbre no tiene bandera final: se convierte en tu terreno de todos los días — leyendo RFCs, dando charlas, negociando, pensando. Este es el kit que te mantiene ahí arriba.</p>
+    <div class="kit-grid reveal-stagger" id="kit-grid"></div>
+  </section>
+
+</main>
+
+<footer>
+  Construido para un ascenso de verdad — sin atajos, sin prisa. · Ruta A1 → C2
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* =========================================================
+   CONTENT DATA
+========================================================= */
+const CAMPS = [
+  {
+    code:'A1', name:'Base Camp', subtitle:'Principiante', duration:'2–3 meses',
+    elevation:'0m', visibility:'Baja — es normal no entender casi nada al inicio',
+    desc:'El primer contacto real con el idioma: sonidos nuevos, la estructura mínima de una frase y el vocabulario que usarás todos los días.',
+    topics:[
+      'Alfabeto y pronunciación — sonidos que no existen en español (/θ/, /ð/, /ɪ/ vs /iː/)',
+      'Verbo "to be" y presente simple',
+      'Vocabulario esencial: números, colores, familia, objetos cotidianos',
+      'Preguntas básicas y small talk: saludar, presentarte',
+      'Artículos, pronombres y plurales'
+    ],
+    dev:'Lee nombres de variables y comentarios simples en inglés. Familiarízate con el idioma de la interfaz de tu editor y de la documentación básica.'
+  },
+  {
+    code:'A2', name:'Sendero', subtitle:'Elemental', duration:'3 meses',
+    elevation:'1,200m', visibility:'Media — reconoces patrones aunque te falte vocabulario',
+    desc:'Ya sostienes conversaciones cortas del día a día: puedes hablar de lo que hiciste, lo que harás y comparar cosas.',
+    topics:[
+      'Pasado simple — verbos regulares e irregulares',
+      'Futuro con "going to" y "will"',
+      'Comparativos y superlativos',
+      'Rutinas diarias, viajes y comida',
+      'Preposiciones de tiempo y lugar'
+    ],
+    dev:'Sigue tutoriales técnicos narrados a velocidad lenta y lee READMEs cortos sin traducir todo.'
+  },
+  {
+    code:'B1', name:'Refugio', subtitle:'Intermedio', duration:'4 meses',
+    elevation:'2,500m', visibility:'Media-alta — sigues conversaciones aunque se te escapen detalles',
+    desc:'El punto medio de la montaña: navegas conversaciones impredecibles, das tu opinión y la justificas.',
+    topics:[
+      'Presente perfecto vs. pasado simple',
+      'Primer y segundo condicional',
+      'Phrasal verbs básicos',
+      'Narrar historias y argumentar una opinión',
+      'Listening con acentos distintos al americano neutro'
+    ],
+    dev:'Lee documentación oficial (MDN, FastAPI, React docs) directamente en inglés. Escribe mensajes de commit y descripciones de issues claros en GitHub.'
+  },
+  {
+    code:'B2', name:'Cresta', subtitle:'Intermedio alto', duration:'5 meses',
+    elevation:'3,800m', visibility:'Alta — la fluidez empieza a aparecer bajo presión',
+    desc:'Aquí el idioma deja de ser un esfuerzo consciente en temas cotidianos: puedes manejar ideas abstractas y debatir.',
+    topics:[
+      'Voz pasiva y estilo indirecto (reported speech)',
+      'Tercer condicional y condicionales mixtos',
+      'Idioms y expresiones comunes en contexto real',
+      'Debatir, defender una postura, presentaciones cortas',
+      'Introducción a business & academic English'
+    ],
+    dev:'Participa en code reviews en inglés, escribe documentación técnica y sigue podcasts o talks de tecnología a velocidad normal.'
+  },
+  {
+    code:'C1', name:'Filo', subtitle:'Avanzado', duration:'6+ meses',
+    elevation:'5,000m', visibility:'Muy alta — captas matices, tono y segundas intenciones',
+    desc:'Cerca de la cumbre: matices, registro y comprensión casi nativa de contenido no adaptado para estudiantes.',
+    topics:[
+      'Vocabulario matizado y registro formal / informal',
+      'Redacción avanzada: ensayos, informes técnicos, propuestas',
+      'Entender películas y series sin subtítulos',
+      'Sarcasmo, humor y referencias culturales',
+      'Public speaking y storytelling técnico'
+    ],
+    dev:'Da charlas técnicas, escribe RFCs o documentos de arquitectura, y entra a entrevistas técnicas en inglés sin fricción mental.'
+  },
+  {
+    code:'C2', name:'Cumbre', subtitle:'Maestría', duration:'Uso continuo',
+    elevation:'5,895m', visibility:'Total — ya no traduces, piensas en inglés',
+    desc:'Dominio nativo: te mueves con la misma soltura en un chat casual, una negociación o un paper técnico.',
+    topics:[
+      'Fluidez en cualquier registro: formal, técnico, casual',
+      'Escritura profesional y creativa de alto nivel',
+      'Negociación, liderazgo y persuasión en inglés',
+      'Dialectos, humor y matices culturales finos',
+      'Comunicación y mentoría en equipos internacionales'
+    ],
+    dev:'Lidera equipos internacionales, habla en conferencias y escribe artículos técnicos publicables directamente en inglés.'
+  }
+];
+
+const KIT = [
+  {flag:'INPUT', title:'Inmersión diaria', body:'Cambia el idioma de tu sistema operativo, tus apps y tus series. El inglés pasivo constante vale más que una hora aislada de estudio.'},
+  {flag:'OUTPUT', title:'Practica hablando', body:'Intercambios de idioma o clases 1:1 online. Producir el idioma —no solo entenderlo— es lo que consolida la fluidez.'},
+  {flag:'FEEDBACK', title:'Corrección real', body:'Escribe y pide que te corrijan: commits, documentación, posts. El error visto a tiempo no se repite.'},
+  {flag:'REPASO', title:'Repetición espaciada', body:'Un sistema de tarjetas para vocabulario nuevo evita que lo olvides a la semana de aprenderlo.'}
+];
+
+/* =========================================================
+   RENDER CAMPS
+========================================================= */
+const container = document.getElementById('camps-container');
+CAMPS.forEach((c, i) => {
+  const section = document.createElement('section');
+  section.className = 'camp';
+  section.id = c.code.toLowerCase();
+  section.innerHTML = `
+    <div class="camp-head reveal">
+      <span class="camp-code">${c.code}</span>
+      <span class="camp-elev">${c.elevation} · ${c.name}</span>
+    </div>
+    <h2 class="reveal">${c.name}</h2>
+    <div class="camp-subtitle reveal">${c.subtitle}</div>
+    <p class="camp-desc reveal">${c.desc}</p>
+    <div class="camp-meta reveal">
+      <div>DURACIÓN<b>${c.duration}</b></div>
+      <div>VISIBILIDAD<b style="font-size:13px;font-weight:600;">${c.visibility}</b></div>
+    </div>
+    <div class="topics reveal-stagger">
+      ${c.topics.map(t => `<div class="topic-card"><span class="flag">⛳ tema</span><p>${t}</p></div>`).join('')}
+    </div>
+    <div class="dev-tip reveal">
+      <span class="flag">// PARA DEVS</span>
+      <p>${c.dev}</p>
+    </div>
+  `;
+  container.appendChild(section);
+});
+
+/* =========================================================
+   RENDER QUIZ
+========================================================= */
+const QUIZ = [
+  {q:'¿Puedes presentarte y decir de dónde eres en inglés?', opts:[
+    {t:'No, apenas reconozco palabras sueltas', s:1},
+    {t:'Sí, con frases muy simples', s:2},
+    {t:'Sí, sin pensarlo', s:4}
+  ]},
+  {q:'Si ves un tutorial técnico en inglés sin subtítulos...', opts:[
+    {t:'No entiendo casi nada', s:1},
+    {t:'Sigo el hilo si hablan despacio', s:3},
+    {t:'Lo entiendo todo a velocidad normal', s:5}
+  ]},
+  {q:'¿Puedes debatir una opinión y defenderla en inglés?', opts:[
+    {t:'No, me quedo sin palabras', s:2},
+    {t:'Más o menos, con errores', s:3},
+    {t:'Sí, con soltura', s:5}
+  ]},
+  {q:'Leer documentación técnica oficial (MDN, docs de un framework)...', opts:[
+    {t:'Necesito traducir casi todo', s:2},
+    {t:'La entiendo con esfuerzo', s:3},
+    {t:'La leo igual que en español', s:5}
+  ]},
+  {q:'¿Entiendes sarcasmo, humor o referencias culturales en inglés?', opts:[
+    {t:'Casi nunca', s:3},
+    {t:'A veces', s:4},
+    {t:'Sí, casi siempre', s:6}
+  ]}
+];
+
+const quizBox = document.getElementById('quiz-box');
+let quizState = new Array(QUIZ.length).fill(null);
+
+function renderQuiz(){
+  quizBox.innerHTML = QUIZ.map((item, qi) => `
+    <div class="quiz-q">
+      <p>${qi+1}. ${item.q}</p>
+      <div class="quiz-opts">
+        ${item.opts.map((o, oi) => `<button type="button" class="quiz-opt" data-q="${qi}" data-o="${oi}" data-s="${o.s}">${o.t}</button>`).join('')}
+      </div>
+    </div>
+  `) + `<div class="quiz-result" id="quiz-result">
+      <span class="code" id="qr-code"></span>
+      <h3 id="qr-title"></h3>
+      <p id="qr-body"></p>
+      <a href="#" class="btn primary" id="qr-cta">Ir a mi campamento</a>
+    </div>`;
+
+  quizBox.querySelectorAll('.quiz-opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const qi = btn.dataset.q;
+      quizBox.querySelectorAll(`.quiz-opt[data-q="${qi}"]`).forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      quizState[qi] = parseInt(btn.dataset.s, 10);
+      if(quizState.every(v => v !== null)) showQuizResult();
+    });
+  });
+}
+
+function showQuizResult(){
+  const avg = quizState.reduce((a,b) => a+b, 0) / quizState.length;
+  const idx = Math.max(0, Math.min(CAMPS.length - 1, Math.round(avg) - 1));
+  const camp = CAMPS[idx];
+  document.getElementById('qr-code').textContent = `RESULTADO · NIVEL SUGERIDO ${camp.code}`;
+  document.getElementById('qr-title').textContent = `Empieza en ${camp.code} — ${camp.name}`;
+  document.getElementById('qr-body').textContent = camp.desc;
+  const cta = document.getElementById('qr-cta');
+  cta.href = `#${camp.code.toLowerCase()}`;
+  document.getElementById('quiz-result').classList.add('show');
+}
+renderQuiz();
+
+/* =========================================================
+   RENDER KIT GRID
+========================================================= */
+document.getElementById('kit-grid').innerHTML = KIT.map(k => `
+  <div class="kit-card">
+    <span class="flag">${k.flag}</span>
+    <h4>${k.title}</h4>
+    <p>${k.body}</p>
+  </div>
+`).join('');
+
+/* =========================================================
+   RENDER PROGRESS RAIL
+========================================================= */
+const rail = document.getElementById('rail');
+CAMPS.forEach(c => {
+  const el = document.createElement('div');
+  el.className = 'rail-dot';
+  el.dataset.target = c.code.toLowerCase();
+  el.innerHTML = `<span class="rail-label">${c.code}</span><span class="rail-mark"></span>`;
+  el.addEventListener('click', () => document.getElementById(c.code.toLowerCase()).scrollIntoView({behavior:'smooth'}));
+  rail.appendChild(el);
+});
+
+/* =========================================================
+   SCROLL: reveal on view + progress + rail state + altitude readout
+========================================================= */
+const revealEls = document.querySelectorAll('.reveal, .reveal-stagger');
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('is-visible'); });
+}, {threshold:0.15});
+revealEls.forEach(el => io.observe(el));
+
+const campSections = CAMPS.map(c => document.getElementById(c.code.toLowerCase()));
+const railDots = rail.querySelectorAll('.rail-dot');
+const topbar = document.getElementById('topbar');
+const altReadout = document.getElementById('alt-readout');
+const campReadout = document.getElementById('camp-readout');
+
+let scrollProgress = 0;
+
+function onScroll(){
+  const doc = document.documentElement;
+  const max = doc.scrollHeight - doc.clientHeight;
+  scrollProgress = max > 0 ? window.scrollY / max : 0;
+  topbar.style.width = (scrollProgress * 100).toFixed(2) + '%';
+
+  let activeIdx = -1;
+  campSections.forEach((sec, i) => {
+    const r = sec.getBoundingClientRect();
+    if(r.top < window.innerHeight * 0.6 && r.bottom > window.innerHeight * 0.2) activeIdx = i;
+  });
+  railDots.forEach((d, i) => d.classList.toggle('active', i === activeIdx));
+
+  if(activeIdx >= 0){
+    altReadout.textContent = CAMPS[activeIdx].elevation;
+    campReadout.textContent = CAMPS[activeIdx].code + ' · ' + CAMPS[activeIdx].name.toUpperCase();
+  } else if(scrollProgress < 0.05){
+    altReadout.textContent = '0m';
+    campReadout.textContent = 'BASE';
+  } else {
+    altReadout.textContent = '5,895m';
+    campReadout.textContent = 'CUMBRE';
+  }
+}
+window.addEventListener('scroll', onScroll, {passive:true});
+onScroll();
+
+/* =========================================================
+   THREE.JS — low-poly mountain the camera climbs as you scroll
+========================================================= */
+(function(){
+  const canvas = document.getElementById('bg-canvas');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isMobile = window.innerWidth < 760;
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x080b14, isMobile ? 0.011 : 0.0085);
+
+  const camera = new THREE.PerspectiveCamera(52, window.innerWidth/window.innerHeight, 0.1, 500);
+
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x000000, 0);
+
+  // lighting
+  const ambient = new THREE.AmbientLight(0x334066, 0.9);
+  scene.add(ambient);
+  const sun = new THREE.DirectionalLight(0xffb56b, 1.1);
+  sun.position.set(-30, 40, 20);
+  scene.add(sun);
+  const rim = new THREE.DirectionalLight(0x3fe0c5, 0.35);
+  rim.position.set(20, 10, -30);
+  scene.add(rim);
+
+  // ---- simple value-noise (hash based) ----
+  function hash2(x, y){
+    let s = Math.sin(x*127.1 + y*311.7) * 43758.5453123;
+    return s - Math.floor(s);
+  }
+  function noise2D(x, y){
+    const xi = Math.floor(x), yi = Math.floor(y);
+    const xf = x - xi, yf = y - yi;
+    const u = xf*xf*(3-2*xf), v = yf*yf*(3-2*yf);
+    const a = hash2(xi, yi), b = hash2(xi+1, yi), c = hash2(xi, yi+1), d = hash2(xi+1, yi+1);
+    return (a*(1-u)+b*u)*(1-v) + (c*(1-u)+d*u)*v;
+  }
+
+  // ---- mountain mesh ----
+  const seg = isMobile ? 26 : 46;
+  const mtGeo = new THREE.PlaneGeometry(140, 220, seg, Math.round(seg*1.5));
+  mtGeo.rotateX(-Math.PI/2);
+  {
+    const pos = mtGeo.attributes.position;
+    for(let i=0;i<pos.count;i++){
+      const x = pos.getX(i), z = pos.getZ(i);
+      const dist = Math.sqrt(x*x + (z+55)*(z+55)) / 78;
+      const peakBase = Math.max(0, 1 - dist);
+      const peak = Math.pow(peakBase, 1.3) * 46;
+      const n1 = noise2D(x*0.045, z*0.045) * 8;
+      const n2 = noise2D(x*0.14, z*0.14) * 2.4;
+      let y = peak + n1 + n2;
+      if(y < 0.4) y = 0.4 + noise2D(x*0.08,z*0.08)*0.6;
+      pos.setY(i, y);
+    }
+    mtGeo.computeVertexNormals();
+  }
+  const mtMat = new THREE.MeshStandardMaterial({
+    color:0x151d33, flatShading:true, metalness:0.15, roughness:0.85
+  });
+  const mountain = new THREE.Mesh(mtGeo, mtMat);
+  mountain.position.set(6, -6, -30);
+  scene.add(mountain);
+
+  // secondary distant ridge for depth
+  const ridgeGeo = new THREE.PlaneGeometry(260, 140, 24, 16);
+  ridgeGeo.rotateX(-Math.PI/2);
+  {
+    const pos = ridgeGeo.attributes.position;
+    for(let i=0;i<pos.count;i++){
+      const x = pos.getX(i), z = pos.getZ(i);
+      const n = noise2D(x*0.03, z*0.03);
+      pos.setY(i, n*22 + 4);
+    }
+    ridgeGeo.computeVertexNormals();
+  }
+  const ridgeMat = new THREE.MeshStandardMaterial({color:0x0d1220, flatShading:true, roughness:1, transparent:true, opacity:0.85});
+  const ridge = new THREE.Mesh(ridgeGeo, ridgeMat);
+  ridge.position.set(0, -20, -140);
+  scene.add(ridge);
+
+  // ---- trail markers (6 camps climbing the slope) ----
+  const trailPoints = [
+    new THREE.Vector3(24, 2, 6),
+    new THREE.Vector3(18, 10, -10),
+    new THREE.Vector3(10, 19, -24),
+    new THREE.Vector3(2, 28, -34),
+    new THREE.Vector3(-3, 36, -42),
+    new THREE.Vector3(-2, 43, -48)
+  ];
+  const markerGeo = new THREE.OctahedronGeometry(0.9, 0);
+  const markers = trailPoints.map((p) => {
+    const mat = new THREE.MeshStandardMaterial({color:0xf2b705, emissive:0xf2b705, emissiveIntensity:0.6, flatShading:true});
+    const m = new THREE.Mesh(markerGeo, mat);
+    m.position.copy(p);
+    scene.add(m);
+    return m;
+  });
+
+  const curve = new THREE.CatmullRomCurve3(trailPoints);
+  const tubeGeo = new THREE.TubeGeometry(curve, 64, 0.08, 6, false);
+  const tubeMat = new THREE.MeshBasicMaterial({color:0xf2b705, transparent:true, opacity:0.35});
+  scene.add(new THREE.Mesh(tubeGeo, tubeMat));
+
+  // ---- drifting particles (embers / snow) ----
+  const pCount = isMobile ? 260 : 620;
+  const pGeo = new THREE.BufferGeometry();
+  const pPos = new Float32Array(pCount*3);
+  for(let i=0;i<pCount;i++){
+    pPos[i*3] = (Math.random()-0.5) * 90;
+    pPos[i*3+1] = Math.random() * 70 - 10;
+    pPos[i*3+2] = (Math.random()-0.5) * 120 - 30;
+  }
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+  const pMat = new THREE.PointsMaterial({color:0xffd27a, size:0.22, transparent:true, opacity:0.55, blending:THREE.AdditiveBlending, depthWrite:false});
+  const particles = new THREE.Points(pGeo, pMat);
+  scene.add(particles);
+
+  camera.position.set(0, 4, 34);
+  camera.lookAt(0, 8, -10);
+
+  let targetY = 4, targetZ = 34, targetRotY = 0;
+  let mouseX = 0, mouseY = 0;
+
+  window.addEventListener('mousemove', (e) => {
+    mouseX = (e.clientX / window.innerWidth - 0.5);
+    mouseY = (e.clientY / window.innerHeight - 0.5);
+  });
+
+  function updateCameraTarget(){
+    const p = scrollProgress;
+    targetY = 4 + p * 46;
+    targetZ = 34 - p * 66;
+    targetRotY = -p * 0.55;
+  }
+  window.addEventListener('scroll', updateCameraTarget, {passive:true});
+  updateCameraTarget();
+
+  function onResize(){
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+  window.addEventListener('resize', onResize);
+
+  let visible = true;
+  document.addEventListener('visibilitychange', () => { visible = !document.hidden; });
+
+  const clock = new THREE.Clock();
+  function animate(){
+    requestAnimationFrame(animate);
+    if(!visible) return;
+    const t = clock.getElapsedTime();
+
+    camera.position.y += (targetY - camera.position.y) * 0.045;
+    camera.position.z += (targetZ - camera.position.z) * 0.045;
+    const parallaxX = isMobile ? 0 : mouseX * 3;
+    const parallaxY = isMobile ? 0 : mouseY * 1.5;
+    camera.position.x += (parallaxX - camera.position.x) * 0.03;
+    camera.lookAt(0, camera.position.y + 4 + parallaxY, camera.position.z - 40);
+    mountain.rotation.y += (targetRotY - mountain.rotation.y) * 0.02;
+    ridge.rotation.y = mountain.rotation.y * 0.5;
+
+    markers.forEach((m, i) => {
+      const pulse = 0.5 + Math.sin(t*1.6 + i) * 0.15;
+      m.material.emissiveIntensity = pulse;
+      m.rotation.y += 0.01;
+    });
+
+    if(!reduceMotion){
+      const pos = pGeo.attributes.position;
+      for(let i=0;i<pCount;i++){
+        let y = pos.getY(i) + 0.03;
+        if(y > 60) y = -10;
+        pos.setY(i, y);
+      }
+      pos.needsUpdate = true;
+    }
+
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
+</script>
+</body>
+</html>
